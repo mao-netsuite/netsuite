@@ -1,0 +1,25 @@
+GUÍA RÁPIDA – INSTALACIÓN DE BOTÓN "Actualizar costo con sueldos" en NetSuite
+
+1. Crear el campo personalizado en el artículo:
+   - ID interno: custitem_costo_con_sueldos
+   - Tipo: Currency (moneda)
+
+2. Subir los scripts:
+   - Ir a Customization > Scripting > Scripts > New
+   - Subir cada script por separado según su tipo:
+     - scheduled_script.js => Scheduled Script
+     - user_event_script.js => User Event Script (para Inventory Item)
+     - suitelet_script.js => Suitelet
+
+3. Crear deployments:
+   - Para cada script subido, crear un deployment (activar).
+
+4. Editar el scriptId y deploymentId en:
+   - user_event_script.js → scriptId y deploymentId del Suitelet
+   - suitelet_script.js → scriptId y deploymentId del Scheduled Script
+
+5. Ir a un artículo de inventario (Inventory Item).
+   - Verás un botón: “Actualizar costo con sueldos”.
+   - Haz clic para ejecutar el script para ese artículo.
+
+¡Listo! El campo se actualizará con el costo promedio + 50 (ejemplo de sueldos).
