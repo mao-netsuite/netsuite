@@ -1,0 +1,49 @@
+<Bill>
+    <BillRefId>${transaction.tranid}</BillRefId>
+    <BillId>${transaction.transactionnumber}</BillId>
+    <Vendor>
+        <Entityid>${transaction.entity}</Entityid>
+        <Address>
+            <ZIP>${vendor.billzip}</ZIP>
+            <City>${vendor.billcity}</City>
+            <Street>${vendor.billaddr1}</Street>
+            <Country>${vendor.billcountry}</Country>
+        </Address>
+        <VATNumber>${vendor.vatregnumber}</VATNumber>
+    </Vendor>
+    <CompanyInformation>
+        <Name>${companyinformation.legalname}</Name>
+        <Address>
+            <ZIP>${companyinformation.zip}</ZIP>
+            <City>${companyinformation.city}</City>
+            <Street>${companyinformation.addr1}</Street>
+            <Country>${companyinformation.country}</Country>
+        </Address>
+        <VATNumber>${companyinformation.taxid}</VATNumber>
+    </CompanyInformation>
+    <Items>
+    <#list transaction.item as item>
+        <Item>
+            <Item>${item.item}</Item>
+            <Quantity>${item.quantity}</Quantity>
+            <TaxCode>${item.taxcode}</TaxCode>
+            <Amount>${item.amount?string("0.00")}</Amount>
+            <TaxAmount>${item.taxamount?string("0.00")}</TaxAmount>
+            <LineItemSubtotal>${item.amount?string("0.00")}</LineItemSubtotal>
+        </Item>
+    </#list>
+    </Items>
+    <Expenses>
+    <#list transaction.expense as expense>
+		<Expense>
+			<Amount>${expense.amount?string("0.00")}</Amount>
+			<Description>${expense.memo}</Description>
+			<TaxAmount>${item.taxamount?string("0.00")}</TaxAmount>
+			<ExpenseSubtotal>${item.amount?string("0.00")}</ExpenseSubtotal>
+		</Expense>
+    </#list>
+    </Expenses>
+    <ItemSummary>
+        <GrossValue>${transaction.grossamt?string("0.00")}</GrossValue>
+    </ItemSummary>
+</Bill>

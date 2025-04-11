@@ -1,0 +1,12 @@
+/**
+ * @preserve
+ * 
+ * @NApiVersion 2.1
+ * @NScriptName E-Invoicing Outbound Bulk Filter CS
+ * @NScriptId _ei_outbound_bulkfltr_form
+ * @NScriptType clientscript
+ * @NModuleScope Public
+ */
+
+/*! For license information please see cs_ei_outbound_bulkfltr_form.js.LICENSE.txt */
+define(["N/url"],(e=>{return t={6943:(e,t,s)=>{var u,o;u=[s(5728)],void 0===(o=function(e){var t,s,u="custpage_ei_process_radio",o="custpage_outbound_svdsrch",r="custpage_selecttxn",i="custpage_sublisteiprocess",a="customscript_ei_outbound_bulkfltrs_su",n="customdeploy_ei_outbound_bulkfltrs_su";function c(e){try{NS.form.setChanged(!1)}catch(e){console.log(e.name,e.message+" "+e.stack)}window.location.href=e}return{pageInit:function(e){t=e.currentRecord;for(var u={},r=window.location.search.substring(1).split("&"),i=0;i<r.length;i++){var a=r[i].split("=");u[a[0]]=a[1]}""!==(s=u.custpage_outbound_savesearchid?u.custpage_outbound_savesearchid:"")&&t.setValue({fieldId:o,value:s,ignoreFieldChange:!0})},fieldChanged:function(t){for(var r,i,d=t.currentRecord,l={},p=window.location.search.substring(1).split("&"),_=0;_<p.length;_++){var g=p[_].split("=");l[g[0]]=g[1]}t.fieldId===u&&(r=d.getValue(u),i=""!==(s=l.custpage_outbound_savesearchid?l.custpage_outbound_savesearchid:"")?{custpage_outbound_eiProcessType:r,custpage_outbound_savesearchid:s}:{custpage_outbound_eiProcessType:r},c(e.resolveScript({scriptId:a,deploymentId:n,params:i}))),t.fieldId===o&&(r=d.getValue(u),i=""!==(s=d.getValue(o))&&""!==r?{custpage_outbound_savesearchid:s,custpage_outbound_eiProcessType:r}:""!==s?{custpage_outbound_savesearchid:s}:{},c(e.resolveScript({scriptId:a,deploymentId:n,params:i})))},markAll:function(){for(var e=0;e<t.getLineCount({sublistId:i});e++)t.selectLine({sublistId:i,line:e}),t.setCurrentSublistValue({sublistId:i,fieldId:r,value:!0}),t.commitLine({sublistId:i})},unmarkAll:function(){for(var e=0;e<t.getLineCount({sublistId:i});e++)t.selectLine({sublistId:i,line:e}),t.setCurrentSublistValue({sublistId:i,fieldId:r,value:!1}),t.commitLine({sublistId:i})}}}.apply(t,u))||(e.exports=o)},5728:t=>{"use strict";t.exports=e}},s={},function e(u){var o=s[u];if(void 0!==o)return o.exports;var r=s[u]={exports:{}};return t[u](r,r.exports,e),r.exports}(6943);var t,s}));

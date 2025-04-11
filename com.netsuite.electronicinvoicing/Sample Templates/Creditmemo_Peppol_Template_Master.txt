@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">
+<cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
+<cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
+<cbc:ID>${transaction.tranid}</cbc:ID>
+<cbc:IssueDate>${transaction.trandate?string["yyyy-MM-dd"]}</cbc:IssueDate>
+<cbc:DueDate></cbc:DueDate>
+<cbc:CreditNoteTypeCode>381</cbc:CreditNoteTypeCode>
+<#if transaction.memo?has_content>
+  <cbc:Note>${transaction.memo}</cbc:Note>
+</#if>
+<#if transaction.taxpointdate?has_content && transaction.taxpointdate !=  transaction.trandate>
+    <cbc:TaxPointDate>${transaction.taxpointdate?string["yyyy-MM-dd"]}</cbc:TaxPointDate>
+</#if>
+<cbc:DocumentCurrencyCode>${transaction.currency.symbol}</cbc:DocumentCurrencyCode>
+<#if transaction.currency != transaction.subsidiary.currency>
+<#if transaction.isbasecurrency == false>
+  <cbc:TaxCurrencyCode>${custom.subCurrencyISOCode}</cbc:TaxCurrencyCode>
+</#if>
+</#if>
+<cbc:AccountingCost></cbc:AccountingCost>
+<#if transaction.otherrefnum?has_content>
+  <cbc:BuyerReference>${transaction.otherrefnum}</cbc:BuyerReference>
+</#if>
+<cac:InvoicePeriod>
+     <cbc:StartDate></cbc:StartDate>
+     <cbc:EndDate></cbc:EndDate>
+     <cbc:DescriptionCode></cbc:DescriptionCode>
+</cac:InvoicePeriod>
+<cac:OrderReference>
+  <#if transaction.otherrefnum?has_content>
+    <cbc:ID>${transaction.otherrefnum}</cbc:ID>
+  <#elseif customer.accountnumber?has_content>
+    <cbc:ID>${customer.accountnumber}</cbc:ID>
+  <#elseif customer.entityid?has_content>
+    <cbc:ID>${customer.entityid}</cbc:ID>
+  </#if>
+   <cbc:SalesOrderID></cbc:SalesOrderID>
+</cac:OrderReference>
+<cac:BillingReference>
+  <cac:InvoiceDocumentReference>
+    <cbc:ID>${transaction.createdfrom?keep_after_last("#")}</cbc:ID>
+	<cbc:IssueDate>${transaction.createdfrom.trandate?string["yyyy-MM-dd"]}</cbc:IssueDate>
+  </cac:InvoiceDocumentReference>
+</cac:BillingReference>
+<cac:DespatchDocumentReference>
+  <cbc:ID></cbc:ID>
+</cac:DespatchDocumentReference>
+<cac:ReceiptDocumentReference>
+  <cbc:ID></cbc:ID>
+</cac:ReceiptDocumentReference>
+<cac:OriginatorDocumentReference>
+  <cbc:ID></cbc:ID>
+</cac:OriginatorDocumentReference>
+<cac:ContractDocumentReference>
+  <cbc:ID></cbc:ID>
+</cac:ContractDocumentReference>
+<cac:AdditionalDocumentReference>
+  <#if transaction.job?has_content>
+   <cbc:ID schemeID="">${transaction.job}</cbc:ID>
+  </#if>
+  <#if transaction.job?has_content>
+   <cbc:DocumentTypeCode>50</cbc:DocumentTypeCode>
+  <#elseif transaction.createdfrom?has_content>
+   <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+  <#else>
+   <cbc:DocumentTypeCode></cbc:DocumentTypeCode>
+  </#if>
+  <cbc:DocumentDescription></cbc:DocumentDescription>
+  <cac:Attachment>
+    <cbc:EmbeddedDocumentBinaryObject mimeCode="" filename=""></cbc:EmbeddedDocumentBinaryObject>
+	<cac:ExternalReference>
+	  <cbc:URI></cbc:URI>
+	</cac:ExternalReference>
+  </cac:Attachment>
+</cac:AdditionalDocumentReference>
+<cac:ProjectReference>
+  <cbc:ID></cbc:ID>
+</cac:ProjectReference>
+<cac:AccountingSupplierParty>
+  <cac:Party>
+   <#if custom.subVatRegNo != "">
+     <cbc:EndpointID schemeID="">${custom.subVatRegNo}</cbc:EndpointID>
+   </#if>
+  <cac:PartyIdentification>
+    <cbc:ID schemeID=""></cbc:ID>
+  </cac:PartyIdentification>
+  <#if custom.isOW =="true">
+    <#if custom.addressee != "" || transaction.subsidiary.name != "">
+    <cac:PartyName>
+    <#if custom.addressee != "">
+    <cbc:Name>${custom.addressee}</cbc:Name>
+    <#elseif transaction.subsidiary.name?contains(":")>
+    <cbc:Name>${transaction.subsidiary.name?keep_after_last(": ")}</cbc:Name>
+    <#else>
+    <cbc:Name>${transaction.subsidiary.name}</cbc:Name>
+    </#if>
+    </cac:PartyName>
+    </#if>
+    <#else>
+    <#if transaction.subsidiary.name != "">
+     <cac:PartyName>
+     <cbc:Name>${transaction.subsidiary.name}</cbc:Name>
+     </cac:PartyName>
+     </#if>
+     </#if>
+  <cac:PostalAddress>
+   <#if transaction.subsidiary.address1?has_content>
+    <cbc:StreetName>${transaction.subsidiary.address1}</cbc:StreetName>
+   </#if>
+   <#if transaction.subsidiary.address2?has_content>
+    <cbc:AdditionalStreetName>${transaction.subsidiary.address2}</cbc:AdditionalStreetName>
+   </#if>
+   <cbc:CityName>${transaction.subsidiary.city}</cbc:CityName>
+    <#if transaction.subsidiary.zip?has_content>
+        <cbc:PostalZone>${transaction.subsidiary.zip}</cbc:PostalZone>
+    </#if>
+   <#if transaction.subsidiary.state?has_content>
+        <cbc:CountrySubentity>${transaction.subsidiary.state}</cbc:CountrySubentity>
+   </#if>
+   <#if transaction.subsidiary.address3?has_content>
+     <cac:AddressLine>
+       <cbc:Line>${transaction.subsidiary.address3}</cbc:Line>
+     </cac:AddressLine>
+   </#if>
+  <cac:Country>
+   	<#if custom.isOW == "true" && custom.subPrimaryCountry != "">
+   	 <cbc:IdentificationCode>${custom.subPrimaryCountry}</cbc:IdentificationCode>
+   	<#elseif custom.isOW == "false" && custom.countryInCompanyInfoCode != "">
+   	 <cbc:IdentificationCode>${custom.countryInCompanyInfoCode}</cbc:IdentificationCode>
+   	<#else>
+   	 <cbc:IdentificationCode></cbc:IdentificationCode>
+   	</#if>
+   </cac:Country>
+  </cac:PostalAddress>
+  <cac:PartyTaxScheme>
+    <cbc:CompanyID>${custom.subVatRegNo}</cbc:CompanyID>
+    <cac:TaxScheme>
+	  <cbc:ID>VAT</cbc:ID>
+	</cac:TaxScheme>
+  </cac:PartyTaxScheme>
+  <cac:PartyLegalEntity>
+    <#if transaction.subsidiary?has_content>
+     <cbc:RegistrationName>${transaction.subsidiary.legalname}</cbc:RegistrationName>
+	</#if>
+    <cbc:CompanyID schemeID=""></cbc:CompanyID>
+	<cbc:CompanyLegalForm></cbc:CompanyLegalForm>
+  </cac:PartyLegalEntity>
+<#if transaction.salesrep?has_content || transaction.salesrep.phone?has_content || transaction.salesrep.email?has_content>
+ <cac:Contact>
+   <#if transaction.salesrep?has_content>
+   <cbc:Name>${transaction.salesrep}</cbc:Name>
+   </#if>
+   <#if transaction.salesrep.phone?has_content>
+   <cbc:Telephone>${transaction.salesrep.phone}</cbc:Telephone>
+   </#if>
+   <#if transaction.salesrep.email?has_content>
+   <cbc:ElectronicMail>${transaction.salesrep.email}</cbc:ElectronicMail>
+   </#if>
+ </cac:Contact>
+ </#if>
+  </cac:Party>
+</cac:AccountingSupplierParty>
+<cac:AccountingCustomerParty>
+ <cac:Party>
+  <#if customer.vatregnumber?has_content>
+    <cbc:EndpointID schemeID="">${customer.vatregnumber}</cbc:EndpointID>
+  <#elseif customer.defaulttaxreg?has_content>
+    <cbc:EndpointID schemeID="">${customer.defaulttaxreg}</cbc:EndpointID>
+  </#if>
+  <cac:PartyIdentification>
+   <cbc:ID schemeID="">${customer.accountnumber}</cbc:ID>
+  </cac:PartyIdentification>
+  <cac:PartyName>
+   <cbc:Name>${customer.companyname}</cbc:Name>
+   </cac:PartyName>
+  <cac:PostalAddress>
+    <#if transaction.billaddr1?has_content>
+      <cbc:StreetName>${transaction.billaddr1}</cbc:StreetName>
+      </#if>
+      <#if transaction.billaddr2?has_content>
+      <cbc:AdditionalStreetName>${transaction.billaddr2}</cbc:AdditionalStreetName>
+      </#if>
+      <#if transaction.billcity?has_content>
+      <cbc:CityName>${transaction.billcity}</cbc:CityName>
+      </#if>
+      <#if transaction.billzip?has_content>
+      <cbc:PostalZone>${transaction.billzip}</cbc:PostalZone>
+      </#if>
+      <#if transaction.billstate?has_content>
+      <cbc:CountrySubentity>${transaction.billstate}</cbc:CountrySubentity>
+      </#if>
+      <#if transaction.billaddr3?has_content>
+      <cac:AddressLine>
+      <cbc:Line>${transaction.billaddr3}</cbc:Line>
+      </cac:AddressLine>
+      </#if>
+	<cac:Country>
+     <cbc:IdentificationCode>${custom.billCountryISOCode}</cbc:IdentificationCode>
+    </cac:Country>
+  </cac:PostalAddress>
+  <cac:PartyTaxScheme>
+   <#if custom.isSuiteTaxAccount == "false">
+      <cbc:CompanyID>${customer.vatregnumber}</cbc:CompanyID>
+      <#else>
+      <cbc:CompanyID>${customer.defaulttaxreg}</cbc:CompanyID>
+   </#if>
+   <cac:TaxScheme>
+    <cbc:ID>VAT</cbc:ID>
+   </cac:TaxScheme>
+  </cac:PartyTaxScheme>
+  <cac:PartyLegalEntity>
+   <#if transaction.billaddressee?has_content>
+     <cbc:RegistrationName>${transaction.billaddressee}</cbc:RegistrationName>
+   <#elseif customer.companyname?has_content>
+     <cbc:RegistrationName>${customer.companyname}</cbc:RegistrationName>
+   </#if>
+   <cbc:CompanyID schemeID=""></cbc:CompanyID>
+  </cac:PartyLegalEntity>
+ <#if customer.phone?has_content || customer.email?has_content>
+   <cac:Contact>
+   <cbc:Name></cbc:Name>
+   <#if customer.phone?has_content>
+    <cbc:Telephone>${customer.phone}</cbc:Telephone>
+   </#if>
+   <#if customer.email?has_content>
+    <cbc:ElectronicMail>${customer.email}</cbc:ElectronicMail>
+   </#if>
+   </cac:Contact>
+ </#if>
+ </cac:Party>
+</cac:AccountingCustomerParty>
+<cac:PayeeParty>
+ <cac:PartyIdentification>
+   <cbc:ID schemeID=""></cbc:ID>
+ </cac:PartyIdentification>
+ <cac:PartyName>
+   <cbc:Name></cbc:Name>
+ </cac:PartyName>
+ <cac:PartyLegalEntity>
+   <cbc:CompanyID schemeID=""></cbc:CompanyID>
+ </cac:PartyLegalEntity>
+</cac:PayeeParty>
+<cac:TaxRepresentativeParty>
+ <cac:PartyName>
+   <cbc:Name></cbc:Name>
+ </cac:PartyName>
+ <cac:PostalAddress>
+   <cbc:StreetName></cbc:StreetName>
+   <cbc:AdditionalStreetName></cbc:AdditionalStreetName>
+   <cbc:CityName></cbc:CityName>
+   <cbc:PostalZone></cbc:PostalZone>
+   <cbc:CountrySubentity></cbc:CountrySubentity>
+   <cac:AddressLine>
+     <cbc:Line></cbc:Line>
+   </cac:AddressLine>
+   <cac:Country>
+     <cbc:IdentificationCode></cbc:IdentificationCode>
+   </cac:Country>
+ </cac:PostalAddress>
+ <cac:PartyTaxScheme>
+  <cbc:CompanyID></cbc:CompanyID>
+  <cac:TaxScheme>
+   <cbc:ID></cbc:ID>
+  </cac:TaxScheme>
+ </cac:PartyTaxScheme>
+</cac:TaxRepresentativeParty>
+<cac:Delivery>
+ <#if transaction.trandate?has_content>
+  <cbc:ActualDeliveryDate>${transaction.trandate?string["yyyy-MM-dd"]}</cbc:ActualDeliveryDate>
+ </#if>
+ <cac:DeliveryLocation>
+   <cbc:ID schemeID=""></cbc:ID>
+   <cac:Address>
+     <#if transaction.shipaddr1?has_content>
+      <cbc:StreetName>${transaction.shipaddr1}</cbc:StreetName>
+      </#if>
+      <#if transaction.shipaddr2?has_content>
+      <cbc:AdditionalStreetName>${transaction.shipaddr2}</cbc:AdditionalStreetName>
+      </#if>
+      <#if transaction.shipcity?has_content>
+      <cbc:CityName>${transaction.shipcity}</cbc:CityName>
+      </#if>
+      <#if transaction.shipzip?has_content>
+      <cbc:PostalZone>${transaction.shipzip}</cbc:PostalZone>
+      </#if>
+      <#if transaction.shipstate?has_content>
+      <cbc:CountrySubentity>${transaction.shipstate}</cbc:CountrySubentity>
+      </#if>
+      <#if transaction.shipaddr3?has_content>
+      <cac:AddressLine>
+      <cbc:Line>${transaction.shipaddr3}</cbc:Line>
+      </cac:AddressLine>
+      </#if>
+	 <cac:Country>
+	  <cbc:IdentificationCode>${transaction.shipcountry}</cbc:IdentificationCode>
+	 </cac:Country>
+   </cac:Address>
+ </cac:DeliveryLocation>
+ <cac:DeliveryParty>
+  <cac:PartyName>
+    <cbc:Name>${transaction.shipaddressee}</cbc:Name>
+  </cac:PartyName>
+ </cac:DeliveryParty>
+</cac:Delivery>
+<cac:PaymentMeans>
+  <cbc:PaymentMeansCode name = ""></cbc:PaymentMeansCode>
+  <cbc:PaymentID></cbc:PaymentID>
+   <#list custom.refundDetailsArr as payment>
+     <cac:CardAccount>
+       <#if payment.cardNumber != ''>
+        <cbc:PrimaryAccountNumberID>${payment.cardNumber}</cbc:PrimaryAccountNumberID>
+       </#if>
+       <#if payment.paymentMethodName != ''>
+        <cbc:NetworkID>${payment.paymentMethodName}</cbc:NetworkID>
+       </#if>
+       <#if payment.cardHolderName != ''>
+        <cbc:HolderName>${payment.cardHolderName}</cbc:HolderName>
+       </#if>
+     </cac:CardAccount>
+    </#list>
+  <cac:PayeeFinancialAccount>
+    <cbc:ID></cbc:ID>
+	<cbc:Name></cbc:Name>
+	<cac:FinancialInstitutionBranch>
+	  <cbc:ID></cbc:ID>
+	</cac:FinancialInstitutionBranch>
+  </cac:PayeeFinancialAccount>
+  <cac:PaymentMandate>
+    <cbc:ID></cbc:ID>
+	<cac:PayerFinancialAccount>
+	  <cbc:ID></cbc:ID>
+	</cac:PayerFinancialAccount>
+  </cac:PaymentMandate>
+</cac:PaymentMeans>
+<cac:PaymentTerms>
+  <cbc:Note></cbc:Note>
+</cac:PaymentTerms>
+<#if custom.shippingCost != "">
+<cac:AllowanceCharge>
+  <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+  <cbc:AllowanceChargeReasonCode>SAA</cbc:AllowanceChargeReasonCode>
+  <cbc:AllowanceChargeReason>Shipping and Handling</cbc:AllowanceChargeReason>
+  <cbc:MultiplierFactorNumeric></cbc:MultiplierFactorNumeric>
+  <#assign amount = transaction.altshippingcost+transaction.althandlingcost>
+  <cbc:Amount currencyID="${transaction.currency.symbol}">${amount?string["#0.00"]}</cbc:Amount>
+  <cbc:BaseAmount currencyID="${transaction.currency.symbol}">${transaction.subtotal?string["#0.00"]}</cbc:BaseAmount>
+  <#if custom.isSuiteTaxAccount == "false">
+    <cac:TaxCategory>
+      <cbc:ID></cbc:ID>
+      <#if transaction.shippingtax1rate != ''>
+      <cbc:Percent>${transaction.shippingtax1rate}</cbc:Percent>
+      </#if>
+  	<cac:TaxScheme>
+  	  <cbc:ID>VAT</cbc:ID>
+  	</cac:TaxScheme>
+    </cac:TaxCategory>
+    </#if>
+    <#if custom.isSuiteTaxAccount == "true">
+    <#list custom.shippingTaxRatesOfSuiteTax as rates>
+    <cac:TaxCategory>
+      <cbc:ID></cbc:ID>
+      <cbc:Percent>${rates}</cbc:Percent>
+  	<cac:TaxScheme>
+  	  <cbc:ID>VAT</cbc:ID>
+  	</cac:TaxScheme>
+    </cac:TaxCategory>
+    </#list>
+    </#if>
+</cac:AllowanceCharge>
+</#if>
+<#if custom.headerDiscount != "">
+<cac:AllowanceCharge>
+  <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+  <cbc:AllowanceChargeReasonCode>95</cbc:AllowanceChargeReasonCode>
+  <cbc:AllowanceChargeReason>Discount</cbc:AllowanceChargeReason>
+  <#if transaction.discountrate?contains("-")>
+  <cbc:MultiplierFactorNumeric>${transaction.discountrate?keep_after("-")?keep_before_last("%")}</cbc:MultiplierFactorNumeric>
+  <#else>
+  <cbc:MultiplierFactorNumeric>${transaction.discountrate?keep_before_last("%")}</cbc:MultiplierFactorNumeric>
+  </#if>
+  <#if transaction.discountrate?contains("-")>
+  <cbc:Amount currencyID="${transaction.currency.symbol}">${transaction.discounttotal?string["#0.00"]?keep_after("-")}</cbc:Amount>
+  <#else>
+  <cbc:Amount currencyID="${transaction.currency.symbol}">${transaction.discounttotal?string["#0.00"]}</cbc:Amount>
+  </#if>
+  <cbc:BaseAmount currencyID="${transaction.currency.symbol}">${transaction.subtotal?string["#0.00"]}</cbc:BaseAmount>
+ <#if custom.isSuiteTaxAccount == "false">
+  <#list custom.taxKeyArr as taxCodeDet>
+   <#if taxCodeDet.taxCode != "">
+	 <cac:TaxCategory>
+            <cbc:ID></cbc:ID>
+            <#if taxCodeDet.taxRate != ''>
+            <cbc:Percent>${taxCodeDet.taxRate}</cbc:Percent>
+            </#if>
+        	<cac:TaxScheme>
+        	  <cbc:ID>VAT</cbc:ID>
+        	</cac:TaxScheme>
+     </cac:TaxCategory>
+	 </#if>
+</#list>
+<#else>
+<#list custom.suiteTaxCodeDetArr as suiteTaxCodeDet>
+   <#if suiteTaxCodeDet.itemTaxCode != "">
+	 <cac:TaxCategory>
+            <cbc:ID></cbc:ID>
+            <#if suiteTaxCodeDet.taxRate != ''>
+            <cbc:Percent>${suiteTaxCodeDet.taxRate}</cbc:Percent>
+            </#if>
+        	<cac:TaxScheme>
+        	  <cbc:ID>VAT</cbc:ID>
+        	</cac:TaxScheme>
+     </cac:TaxCategory>
+	 </#if>
+</#list>
+</#if>
+</cac:AllowanceCharge>
+</#if>
+  <cac:TaxTotal>
+     <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${transaction.taxtotal?string["#0.00"]}</cbc:TaxAmount>
+  <#list custom.taxKeyArr as taxDetails>
+  <#if taxDetails.taxRate != ''>
+  	<cac:TaxSubtotal>
+  	      <#assign taxableAmount = taxDetails.taxableAmount?number?string["#0.00"]>
+            <#assign taxAmount = taxDetails.taxAmount?number?string["#0.00"]>
+            <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount}</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount}</cbc:TaxAmount>
+      <#if custom.isSuiteTaxAccount == "false">
+  	<cac:TaxCategory>
+  	    <cbc:ID></cbc:ID>
+  	    <#if taxDetails.taxRate != ''>
+  	    <cbc:Percent>${taxDetails.taxRate}</cbc:Percent>
+  	    </#if>
+  	    <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+  	    <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+      <cac:TaxScheme>
+  	    <cbc:ID>VAT</cbc:ID>
+  	</cac:TaxScheme>
+  	</cac:TaxCategory>
+  	<#else>
+  	<#list taxDetails.taxRates as multipleRates>
+  	<cac:TaxCategory>
+          <cbc:ID></cbc:ID>
+          <#if multipleRates != ''>
+          <cbc:Percent>${multipleRates}</cbc:Percent>
+          </#if>
+          <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+          <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+      <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+      </cac:TaxScheme>
+      </cac:TaxCategory>
+      </#list>
+  	</#if>
+  	</cac:TaxSubtotal>
+  </#if>
+  </#list>
+   <#if custom.matchingShippingTaxCode == "0" && custom.matchingHandlingTaxCode == "0">
+        <#if custom.shippingTaxCode == custom.handlingTaxCode && custom.shippingTaxRate != '' && custom.handlingTaxRate != ''>
+        <cac:TaxSubtotal>
+   	    <#assign taxableAmount = custom.shippingCost?string?number + custom.handlingCost?string?number>
+        <#assign taxAmount = custom.reducedShippingCost?string?number + custom.reducedHandlingCost?string?number>
+             <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount?number?string["#0.00"]}</cbc:TaxableAmount>
+             <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount?number?string["#0.00"]}</cbc:TaxAmount>
+        	<cac:TaxCategory>
+        	    <cbc:ID></cbc:ID>
+        	    <cbc:Percent>${custom.shippingTaxRate}</cbc:Percent>
+        	    <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+        	    <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+           <cac:TaxScheme>
+        	    <cbc:ID>VAT</cbc:ID>
+          	 </cac:TaxScheme>
+        	</cac:TaxCategory>
+        </cac:TaxSubtotal>
+        <#elseif custom.shippingTaxCode != custom.handlingTaxCode>
+            <#if custom.shippingTaxRate != ''>
+            <cac:TaxSubtotal>
+            <#assign taxableAmount = custom.shippingCost?string?number>
+            <#assign taxAmount = custom.reducedShippingCost?string?number>
+              <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount?number?string["#0.00"]}</cbc:TaxableAmount>
+              <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount?number?string["#0.00"]}</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID></cbc:ID>
+                <cbc:Percent>${custom.shippingTaxRate}</cbc:Percent>
+                <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+                <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+             <cac:TaxScheme>
+                <cbc:ID>VAT</cbc:ID>
+             </cac:TaxScheme>
+            </cac:TaxCategory>
+            </cac:TaxSubtotal>
+            </#if>
+        <#if custom.handlingTaxRate != ''>
+        <cac:TaxSubtotal>
+         <#assign taxableAmount = custom.handlingCost?string?number>
+           <#assign taxAmount = custom.reducedHandlingCost?string?number>
+             <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount?number?string["#0.00"]}</cbc:TaxableAmount>
+             <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount?number?string["#0.00"]}</cbc:TaxAmount>
+         <cac:TaxCategory>
+             <cbc:ID></cbc:ID>
+             <cbc:Percent>${custom.handlingTaxRate}</cbc:Percent>
+             <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+             <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+            <cac:TaxScheme>
+             <cbc:ID>VAT</cbc:ID>
+            </cac:TaxScheme>
+         </cac:TaxCategory>
+        </cac:TaxSubtotal>
+        </#if>
+      </#if>
+   <#elseif custom.matchingShippingTaxCode == "0" && custom.shippingTaxRate != ''>
+        <cac:TaxSubtotal>
+           <#assign taxableAmount = custom.shippingCost?string?number>
+           <#assign taxAmount = custom.reducedShippingCost?string?number>
+             <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount?number?string["#0.00"]}</cbc:TaxableAmount>
+             <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount?number?string["#0.00"]}</cbc:TaxAmount>
+           <cac:TaxCategory>
+               <cbc:ID></cbc:ID>
+               <cbc:Percent>${custom.shippingTaxRate}</cbc:Percent>
+               <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+               <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+            <cac:TaxScheme>
+               <cbc:ID>VAT</cbc:ID>
+            </cac:TaxScheme>
+           </cac:TaxCategory>
+        </cac:TaxSubtotal>
+   <#elseif custom.matchingHandlingTaxCode == "0" && custom.handlingTaxRate != ''>
+        <cac:TaxSubtotal>
+            <#assign taxableAmount = custom.handlingCost?string?number>
+              <#assign taxAmount = custom.reducedHandlingCost?string?number>
+                <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount?number?string["#0.00"]}</cbc:TaxableAmount>
+                <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount?number?string["#0.00"]}</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID></cbc:ID>
+                <cbc:Percent>${custom.handlingTaxRate}</cbc:Percent>
+                <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+                <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+               <cac:TaxScheme>
+                <cbc:ID>VAT</cbc:ID>
+               </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+   </#if>
+   <#list custom.mismatchedDiscountItemTaxCodesArr as taxDetails>
+   <#if taxDetails.taxRate != ''>
+   	<cac:TaxSubtotal>
+   	       <#assign taxableAmount = taxDetails.taxableAmount?number?string["#0.00"]>
+           <#assign taxAmount = taxDetails.taxAmount?number?string["#0.00"]>
+           <#if taxableAmount?contains("-")>
+           <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount?keep_after("-")}</cbc:TaxableAmount>
+           <#else>
+           <cbc:TaxableAmount currencyID="${transaction.currency.symbol}">${taxableAmount}</cbc:TaxableAmount>
+           </#if>
+           <#if taxAmount?contains("-")>
+           <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount?keep_after("-")}</cbc:TaxAmount>
+           <#else>
+           <cbc:TaxAmount currencyID="${transaction.currency.symbol}">${taxAmount}</cbc:TaxAmount>
+           </#if>
+   	<cac:TaxCategory>
+   	   <cbc:ID></cbc:ID>
+   	    <#if taxDetails.taxRate != ''>
+   	    <cbc:Percent>${taxDetails.taxRate}</cbc:Percent>
+   	    </#if>
+   	    <cbc:TaxExemptionReasonCode></cbc:TaxExemptionReasonCode>
+   	    <cbc:TaxExemptionReason></cbc:TaxExemptionReason>
+       <cac:TaxScheme>
+   	    <cbc:ID>VAT</cbc:ID>
+   	</cac:TaxScheme>
+   	</cac:TaxCategory>
+   	</cac:TaxSubtotal>
+   </#if>
+   </#list>
+</cac:TaxTotal>
+<cac:LegalMonetaryTotal>
+  <cbc:LineExtensionAmount currencyID="${transaction.currency.symbol}">${transaction.subtotal?string["#0.00"]}</cbc:LineExtensionAmount>
+  <#assign chargeTotalAmount = transaction.altshippingcost + transaction.althandlingcost>
+  <#assign taxExclusiveAmount = chargeTotalAmount + transaction.subtotal + transaction.discounttotal>
+  <cbc:TaxExclusiveAmount currencyID="${transaction.currency.symbol}">${taxExclusiveAmount?string["#0.00"]}</cbc:TaxExclusiveAmount>
+  <cbc:TaxInclusiveAmount currencyID="${transaction.currency.symbol}">${transaction.total?string["#0.00"]}</cbc:TaxInclusiveAmount>
+   <#assign discounttotal = transaction.discounttotal?string["#0.00"]>
+    <#if discounttotal?contains("-")>
+        <cbc:AllowanceTotalAmount currencyID="${transaction.currency.symbol}">${discounttotal?keep_after("-")}</cbc:AllowanceTotalAmount>
+        <#else>
+        <cbc:AllowanceTotalAmount currencyID="${transaction.currency.symbol}">${discounttotal}</cbc:AllowanceTotalAmount>
+    </#if>
+  <cbc:ChargeTotalAmount currencyID="${transaction.currency.symbol}">${transaction.altshippingcost?string["#0.00"]}</cbc:ChargeTotalAmount>
+  <cbc:PrepaidAmount currencyID="${transaction.currency.symbol}">${transaction.amountpaid?string["#0.00"]}</cbc:PrepaidAmount>
+  <cbc:PayableRoundingAmount currencyID=""></cbc:PayableRoundingAmount>
+  <cbc:PayableAmount currencyID="${transaction.currency.symbol}">${transaction.amountremaining?string["#0.00"]}</cbc:PayableAmount>
+</cac:LegalMonetaryTotal>
+<#list transaction.item as item>
+<cac:CreditNoteLine>
+  <cbc:ID>${item.line}</cbc:ID>
+  <cbc:Note>${transaction.memo}</cbc:Note>
+  <cbc:CreditedQuantity unitCode="NAR">${item.quantity?c}</cbc:CreditedQuantity>
+  <#if item.itemtype != "Description">
+  <#assign amount = item.amount>
+    <#if amount gte 0 >
+    <cbc:LineExtensionAmount currencyID= "${transaction.currency.symbol}">${item.amount?string["#0.00"]}</cbc:LineExtensionAmount>
+    <#elseif amount lt 0 >
+    <cbc:LineExtensionAmount currencyID= "${transaction.currency.symbol}">${item.amount?string["#0.00"]?keep_after("-")}</cbc:LineExtensionAmount>
+    </#if>
+  <#else>
+    <cbc:LineExtensionAmount currencyID= "${transaction.currency.symbol}"></cbc:LineExtensionAmount>
+  </#if>
+  <cbc:AccountingCost></cbc:AccountingCost>
+  <cac:InvoicePeriod>
+    <cbc:StartDate></cbc:StartDate>
+	<cbc:EndDate></cbc:EndDate>
+  </cac:InvoicePeriod>
+  <cac:OrderLineReference>
+    <cbc:LineID></cbc:LineID>
+  </cac:OrderLineReference>
+  <cac:DocumentReference>
+    <cbc:ID schemeID=""></cbc:ID>
+    <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+  </cac:DocumentReference>
+  <cac:AllowanceCharge>
+    <#if item.itemtype == "Discount">
+     <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+	<#else>
+	 <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+	</#if>
+	<#if item.itemtype == "Discount">
+     <cbc:AllowanceChargeReasonCode>95</cbc:AllowanceChargeReasonCode>
+	<#else>
+	 <cbc:AllowanceChargeReasonCode></cbc:AllowanceChargeReasonCode>
+	</#if>
+    <#if item.itemtype == "Discount">
+     <cbc:AllowanceChargeReason>Discount</cbc:AllowanceChargeReason>
+	 <#if item.rate?contains("%")>
+	 <#assign rate = item.rate?keep_before_last("%")>
+	  <cbc:MultiplierFactorNumeric>${rate?keep_after("-")}</cbc:MultiplierFactorNumeric>
+	 <#else>
+	  <cbc:MultiplierFactorNumeric>${item.rate?string["#0.00"]}</cbc:MultiplierFactorNumeric>
+	 </#if>
+	</#if>
+	<#if item.itemtype == "Discount">
+    <#assign amount = item.amount?string["#0.00"]>
+     <cbc:Amount currencyID="${transaction.currency.symbol}">${amount?keep_after("-")}</cbc:Amount>
+    <#else>
+     <cbc:Amount currencyID=""></cbc:Amount>
+    </#if>
+	<cbc:BaseAmount currencyID=""></cbc:BaseAmount>
+  </cac:AllowanceCharge>
+<#if item.itemtype != "Description">
+  <cac:Item>
+    <cbc:Description>${item.description}</cbc:Description>
+	<cbc:Name>${item.item}</cbc:Name>
+	<cac:BuyersItemIdentification>
+	  <cbc:ID></cbc:ID>
+	</cac:BuyersItemIdentification>
+	<cac:SellersItemIdentification>
+	<#if item.itemtype == "Discount">
+	  <cbc:ID></cbc:ID>
+	<#else>
+	  <cbc:ID>${item.item}</cbc:ID>
+	</#if>
+	</cac:SellersItemIdentification>
+	<#list custom.allItemDetails as item1>
+	<#assign txnItemName = item.item>
+	<#assign customItemName = item1.itemName>
+	<#if txnItemName == customItemName>
+    <#if item1?index==item?index>
+    <#if item1.itemUpcCode != ''>
+    <cac:StandardItemIdentification>
+	<cbc:ID schemeID = "0160">${item1.itemUpcCode}</cbc:ID>
+	</cac:StandardItemIdentification>
+	</#if>
+	</#if>
+	<#if item1?index==item?index>
+	<#if item1.itemCountry != ''>
+	  <cac:OriginCountry>
+	  <cbc:IdentificationCode>${item1.itemCountry}</cbc:IdentificationCode>
+	  </cac:OriginCountry>
+	</#if>
+	</#if>
+	<#if item1.itemCountry != '' && item1.itemUpcCode != ''>
+	<cac:CommodityClassification>
+	 <#if item1?index==item?index>
+	  <cbc:ItemClassificationCode listID="HS" listVersionID ="">${item1.itemUpcCode}</cbc:ItemClassificationCode>
+	 </#if>
+	</cac:CommodityClassification>
+	</#if>
+	</#if>
+	</#list>
+ <#if custom.isSuiteTaxAccount == "false">
+ <cac:ClassifiedTaxCategory>
+     <cbc:ID></cbc:ID>
+     <#if item.itemtype != "Description">
+     <cbc:Percent>${item.taxrate1?keep_before_last("%")}</cbc:Percent>
+     <#else>
+     <cbc:Percent></cbc:Percent>
+     </#if>
+     <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+     </cac:TaxScheme>
+ </cac:ClassifiedTaxCategory>
+ <#else>
+ <#if item.itemtype != "Discount" && item.itemtype != "Description">
+ <#assign count = 0>
+     <#list custom.uniqueItemsWithMultipleTaxRatesInSTArr as taxRates>
+         <#if taxRates.lineNumber == item.line>
+             <#list taxRates.taxRates as multipleRates>
+              <cac:ClassifiedTaxCategory>
+                  <cbc:ID></cbc:ID>
+                  <cbc:Percent>${multipleRates}</cbc:Percent>
+                  <cac:TaxScheme>
+                  	  <cbc:ID>VAT</cbc:ID>
+                  </cac:TaxScheme>
+              </cac:ClassifiedTaxCategory>
+             </#list>
+         <#else>
+           <#assign count = count + 1>
+         </#if>
+     </#list>
+     <#if count == custom.uniqueItemsWithMultipleTaxRatesInSTArrLength?number>
+      <cac:ClassifiedTaxCategory>
+          <cbc:ID></cbc:ID>
+          <cbc:Percent></cbc:Percent>
+          <cac:TaxScheme>
+               <cbc:ID>VAT</cbc:ID>
+          </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+      </#if>
+ <#else>
+   <cac:ClassifiedTaxCategory>
+         <cbc:ID></cbc:ID>
+         <cbc:Percent></cbc:Percent>
+         <cac:TaxScheme>
+              <cbc:ID>VAT</cbc:ID>
+         </cac:TaxScheme>
+   </cac:ClassifiedTaxCategory>
+ </#if>
+ </#if>
+	<cac:AdditionalItemProperty>
+	  <cbc:Name></cbc:Name>
+	  <cbc:Value></cbc:Value>
+	</cac:AdditionalItemProperty>
+  </cac:Item>
+  <#assign rate = item.rate >
+    <cac:Price>
+    <#if rate?has_content && rate?trim != ''>
+    <#if rate gte 0>
+        <cbc:PriceAmount currencyID= "${transaction.currency.symbol}">${item.rate?string["#0.00"]}</cbc:PriceAmount>
+     <#elseif rate lt 0>
+        <cbc:PriceAmount currencyID= "${transaction.currency.symbol}">${item.rate?string["#0.00"]?keep_after(".")}</cbc:PriceAmount>
+     </#if>
+     <#else>
+     <cbc:PriceAmount currencyID = "${transaction.currency.symbol}"></cbc:PriceAmount>
+     </#if>
+	 <cbc:BaseQuantity unitCode="">${item.quantity?c}</cbc:BaseQuantity>
+	 <cac:AllowanceCharge>
+       <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+       <#assign amount = item.amount?string["#0.00"]>
+       <#if item.itemtype == "Discount">
+         <cbc:Amount currencyID="${transaction.currency.symbol}">${amount?keep_after("-")}</cbc:Amount>
+       <#else>
+         <cbc:Amount currencyID="${transaction.currency.symbol}"></cbc:Amount>
+       </#if>
+       <#if amount?contains("-")>
+       <cbc:BaseAmount currencyID="${transaction.currency.symbol}">${amount?keep_after("-")}</cbc:BaseAmount>
+       <#else>
+       <cbc:BaseAmount currencyID="${transaction.currency.symbol}">${amount}</cbc:BaseAmount>
+       </#if>
+     </cac:AllowanceCharge>
+  </cac:Price>
+</#if>
+  </cac:CreditNoteLine>
+</#list>
+</CreditNote>

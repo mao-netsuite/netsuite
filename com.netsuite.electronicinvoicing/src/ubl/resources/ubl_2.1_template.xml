@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<#assign transactionType = avalara_cds.transaction.transactionType>
+<#if transactionType = 'invoice'>
+    <#assign transactionTag = 'Invoice'>
+    <#assign rootAttributes = 'xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+        xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 UBL-Invoice-2.1.xsd"'>
+    <#assign transactionTypeCodeTag = 'InvoiceTypeCode'>
+    <#assign transactionLineTag = 'InvoiceLine'>
+    <#assign transactionLineQuantityTag = 'InvoicedQuantity'>
+<#elseif transactionType = 'creditmemo'>
+    <#assign transactionTag = 'CreditNote'>
+    <#assign rootAttributes = 'xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2"
+        xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2 UBL-CreditNote-2.1.xsd"'>
+    <#assign transactionTypeCodeTag = 'CreditNoteTypeCode'>
+    <#assign transactionLineTag = 'CreditNoteLine'>
+    <#assign transactionLineQuantityTag = 'CreditedQuantity'>
+<#else>
+    <#assign transactionTag = 'Invoice'>
+    <#assign rootAttributes = 'xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 UBL-Invoice-2.xsd"'>
+    <#assign transactionTypeCodeTag = 'InvoiceTypeCode'>
+    <#assign transactionLineTag = 'InvoiceLine'>
+    <#assign transactionLineQuantityTag = 'InvoicedQuantity'>
+</#if>
+<${transactionTag} ${rootAttributes}>
+    <cbc:ID>${avalara_cds.transaction.id}</cbc:ID>
+    <cbc:IssueDate>${avalara_cds.transaction.issueDate}</cbc:IssueDate>
+    <cbc:${transactionTypeCodeTag}>${avalara_cds.transaction.transactionTypeCode._value}</cbc:${transactionTypeCodeTag}>
+     <#if avalara_cds.transaction.note?has_content><#list avalara_cds.transaction.note as note><cbc:Note>${note._value}</cbc:Note>
+        </#list>
+    </#if>
+    <cbc:DocumentCurrencyCode>${avalara_cds.transaction.documentCurrencyCode._value}</cbc:DocumentCurrencyCode>
+    <#if avalara_cds.transaction.billingReference.invoiceDocumentReference.id?has_content>
+    <cac:BillingReference>
+        <cac:InvoiceDocumentReference>
+            <cbc:ID>${avalara_cds.transaction.billingReference.invoiceDocumentReference.id}</cbc:ID>
+        </cac:InvoiceDocumentReference>
+    </cac:BillingReference>
+    </#if>
+    <#if avalara_cds.transaction.additionalDocumentReferences?has_content>
+    <#list avalara_cds.transaction.additionalDocumentReferences as additionalDocumentReference><cac:AdditionalDocumentReference>
+        <cbc:ID>${additionalDocumentReference.id}</cbc:ID>
+        <cbc:DocumentDescription>${additionalDocumentReference.documentDescription}</cbc:DocumentDescription>
+    </cac:AdditionalDocumentReference></#list>
+    </#if>
+    <cac:AccountingSupplierParty>
+        <#if avalara_cds.transaction.accountingSupplierParty.party?has_content><#assign supplierParty = avalara_cds.transaction.accountingSupplierParty.party><cac:Party>
+            <#if supplierParty.partyIdentification?has_content><#list supplierParty.partyIdentification as partyIdentification><cac:PartyIdentification>
+                <cbc:ID>${partyIdentification.id}</cbc:ID>
+             </cac:PartyIdentification>
+            </#list></#if><#if supplierParty.partyName?has_content><#list supplierParty.partyName as partyName><cac:PartyName>
+                <cbc:Name>${partyName.name._value}</cbc:Name>
+            </cac:PartyName>
+            </#list></#if><#if supplierParty.partyLegalEntity?has_content><#list supplierParty.partyLegalEntity as partyLegalEntity><cac:PartyLegalEntity>
+                <cbc:CompanyID>${partyLegalEntity.companyId}</cbc:CompanyID>
+            </cac:PartyLegalEntity>
+        </#list></#if></cac:Party></#if>
+    </cac:AccountingSupplierParty>
+    <cac:AccountingCustomerParty>
+        <#if avalara_cds.transaction.accountingSupplierParty.party?has_content><#assign customerParty = avalara_cds.transaction.accountingCustomerParty.party><cac:Party>
+            <#if customerParty.partyIdentification?has_content><#list customerParty.partyIdentification as partyIdentification><cac:PartyIdentification>
+                <cbc:ID>${partyIdentification.id}</cbc:ID>
+           </cac:PartyIdentification>
+            </#list></#if><#if customerParty.partyName?has_content><#list customerParty.partyName as partyName><cac:PartyName>
+                <cbc:Name>${partyName.name._value}</cbc:Name>
+            </cac:PartyName>
+            </#list></#if><#if customerParty.partyLegalEntity?has_content><#list customerParty.partyLegalEntity as partyLegalEntity><cac:PartyLegalEntity>
+                <cbc:CompanyID>${partyLegalEntity.id}</cbc:CompanyID>
+            </cac:PartyLegalEntity>
+        </#list></#if></cac:Party>
+    </#if></cac:AccountingCustomerParty>
+    <#if avalara_cds.transaction.taxTotal?has_content><#list avalara_cds.transaction.taxTotal as taxTotal><cac:TaxTotal>
+        <cbc:TaxAmount currencyID="${taxTotal.taxAmount.currencyId}">${taxTotal.taxAmount._value}</cbc:TaxAmount>
+    </cac:TaxTotal>
+    </#list></#if><cac:LegalMonetaryTotal><#assign legalMonetaryTotal = avalara_cds.transaction.legalMonetaryTotal>
+        <#if legalMonetaryTotal.lineExtensionAmount?has_content><cbc:LineExtensionAmount currencyID="${legalMonetaryTotal.lineExtensionAmount.currencyId}">${legalMonetaryTotal.lineExtensionAmount._value}</cbc:LineExtensionAmount>
+        </#if><#if legalMonetaryTotal.taxExclusiveAmount?has_content><cbc:TaxExclusiveAmount currencyID="${legalMonetaryTotal.taxExclusiveAmount.currencyId}">${legalMonetaryTotal.taxExclusiveAmount._value}</cbc:TaxExclusiveAmount>
+        </#if><#if legalMonetaryTotal.taxInclusiveAmount?has_content><cbc:TaxInclusiveAmount currencyID="${legalMonetaryTotal.taxInclusiveAmount.currencyId}">${legalMonetaryTotal.taxInclusiveAmount._value}</cbc:TaxInclusiveAmount>
+        </#if><cbc:PayableAmount currencyID="${legalMonetaryTotal.payableAmount.currencyId}">${legalMonetaryTotal.payableAmount._value}</cbc:PayableAmount>
+    </cac:LegalMonetaryTotal>
+    <#list avalara_cds.transaction.transactionLines as transactionLine><cac:${transactionLineTag}>
+        <cbc:ID>${transactionLine.id}</cbc:ID>
+        <#if transactionLine.transactionQuantity?has_content><cbc:${transactionLineQuantityTag} unitCode="${transactionLine.transactionQuantity.unitCode}">${transactionLine.transactionQuantity._value}</cbc:${transactionLineQuantityTag}>
+        </#if><cbc:LineExtensionAmount currencyID="${transactionLine.lineExtensionAmount.currencyId}">${transactionLine.lineExtensionAmount._value}</cbc:LineExtensionAmount>
+        <cac:Item><#assign item = transactionLine.item>
+            <#if item.description?has_content><#list item.description as description><cbc:Description>${description._value}</cbc:Description>
+            </#list></#if><#if item.standardItemIdentification?has_content><cac:StandardItemIdentification>
+                <cbc:ID>${item.standardItemIdentification.id}</cbc:ID>
+            </cac:StandardItemIdentification>
+            </#if><#if item.classifiedTaxCategory?has_content><#list item.classifiedTaxCategory as classifiedTaxCategory><cac:ClassifiedTaxCategory>
+                <#if classifiedTaxCategory.percent?has_content><cbc:Percent>${classifiedTaxCategory.percent}</cbc:Percent>
+                </#if><cac:TaxScheme>
+                        <cbc:ID>${classifiedTaxCategory.taxScheme.id}</cbc:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </#list></#if></cac:Item>
+        <#if transactionLine.price?has_content><cac:Price>
+            <cbc:PriceAmount currencyID="${transactionLine.price.priceAmount.currencyId}">${transactionLine.price.priceAmount._value}</cbc:PriceAmount>
+        </cac:Price>
+    </#if></cac:${transactionLineTag}></#list>
+</${transactionTag}>

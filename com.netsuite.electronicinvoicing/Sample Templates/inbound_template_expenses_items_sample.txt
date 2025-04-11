@@ -1,0 +1,29 @@
+{
+	"tranid": "${XML.Invoice.InvoiceHeader.InvoiceNumber}",
+	"trandate": "${XML.Invoice.InvoiceHeader.InvoiceDate}",
+	"currency": "${XML.Invoice.InvoiceHeader.Currency}",
+	"memo": "${XML.Invoice.InvoiceHeader.Memo}",
+	"createdfrom": "${XML.Invoice.InvoiceHeader.PONumber}",
+	"item":[
+		<#list XML.Invoice.InvoiceDetails.InvoiceItem as item>
+		{
+			"vendorcode": "${item.ItemName}",
+			"quantity": "${item.Quantity}",
+			"rate": "${item.UnitPrice?replace("$", "")}",
+			"amount": "${item.LineItemSubtotal?replace("$", "")}",
+			"description": "${item.Description}",
+			"tax1amt": "${item.TaxAmount?replace("$", "")}"
+		}
+		<#if item_has_next>,</#if>
+	    </#list>
+    ],
+	"expense":[
+		<#list XML.Invoice.InvoiceDetails.InvoiceExpense as expense>
+		{
+			"amount": "${expense.Amount?replace("$", "")}",
+			"memo": "${expense.Description}"
+		}
+		<#if expense_has_next>,</#if>
+	    </#list>
+    ]
+}

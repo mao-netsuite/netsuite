@@ -1,0 +1,41 @@
+<#ftl ns_prefixes={"D": "urn:oasis:names:specification:ubl:schema:xsd:Order-2","cac":"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2", "cbc":"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"}>
+{
+    "otherrefnum": "${XML["D:Order"]["cbc:ID"]}",
+    <#if custom["isMultiCurrency"] == "true">
+        "currency":"${CUSTOM["currencyName"]}",
+    </#if>
+    "message": "${CUSTOM["message"]}",
+    <#if custom["salesrep"] != "">
+        "salesrep": "${CUSTOM["salesrep"]}",
+    </#if>
+    <#if custom["shipdate"] != "">
+        "shipdate": "${CUSTOM["shipdate"]}",
+    </#if>
+    "shipaddress": {
+        "country": "${XML["D:Order"]["cac:Delivery"]["cac:DeliveryLocation"]["cac:Address"]["cac:Country"]["cbc:IdentificationCode"]}", 
+        "addr1": "${XML["D:Order"]["cac:Delivery"]["cac:DeliveryLocation"]["cac:Address"]["cbc:StreetName"]}",
+        "addr2": "${XML["D:Order"]["cac:Delivery"]["cac:DeliveryLocation"]["cac:Address"]["cbc:AdditionalStreetName"]}",
+        "addr3": "${XML["D:Order"]["cac:Delivery"]["cac:DeliveryLocation"]["cac:Address"]["cac:AddressLine"]["cbc:Line"]}",
+        "city": "${XML["D:Order"]["cac:Delivery"]["cac:DeliveryLocation"]["cac:Address"]["cbc:CityName"]}",
+        "state": "${XML["D:Order"]["cac:Delivery"]["cac:DeliveryLocation"]["cac:Address"]["cbc:CountrySubentity"]}",
+        "zip": "${XML["D:Order"]["cac:Delivery"]["cac:DeliveryLocation"]["cac:Address"]["cbc:PostalZone"]}"
+    },
+    "item": [
+        <#assign index=0>
+        <#assign taxcodeString="taxcode_">
+        <#assign priceString ="price_">
+        <#assign lineExtensionString ="lineextension_">
+        <#list XML["D:Order"]["cac:OrderLine"] as item>
+            {
+                "item": "${item["cac:LineItem"]["cac:Item"]["cbc:Name"]}",
+                "quantity": "${item["cac:LineItem"]["cbc:Quantity"]}",
+                "rate": "${CUSTOM[priceString+index]}",
+                "amount": "${CUSTOM[lineExtensionString+index]}",
+                "description": "${item["cac:LineItem"]["cac:Item"]["cbc:Description"]}",
+                "taxcode": "${CUSTOM[taxcodeString+index]}"
+                <#assign index++>
+            }
+            <#if item_has_next>,</#if>
+        </#list>
+    ]
+}

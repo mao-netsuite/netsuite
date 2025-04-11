@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Order xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:oasis:names:specification:ubl:schema:xsd:Order-2"
+    xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+    <cbc:CustomizationID>urn:fdc:peppol.eu:poacc:trns:order:3</cbc:CustomizationID>
+    <cbc:ProfileID>urn:fdc:peppol.eu:poacc:bis:order_only:3</cbc:ProfileID>
+    <#if transaction.tranid?has_content>
+        <cbc:ID>${transaction.tranid}</cbc:ID>
+    </#if>
+    <cbc:IssueDate>${transaction.trandate?string["yyyy-MM-dd"]}</cbc:IssueDate>
+    <cbc:OrderTypeCode>220</cbc:OrderTypeCode>
+    <#if transaction.memo?has_content>
+        <cbc:Note>${transaction.memo}</cbc:Note>
+    </#if>
+    <#assign txnCurrencyID=transaction.currencysymbol />
+    <cbc:DocumentCurrencyCode>${txnCurrencyID}</cbc:DocumentCurrencyCode>
+    <#list custom.attachmentDetails as attachment>
+        <cac:AdditionalDocumentReference>
+            <cbc:ID>${attachment.id}</cbc:ID>
+            <#if attachment.description?trim?has_content>
+            <cbc:DocumentType>${attachment.description}</cbc:DocumentType>
+            <#else>
+                <cbc:DocumentType>${attachment.name}</cbc:DocumentType>
+            </#if>
+        </cac:AdditionalDocumentReference>
+    </#list>
+    <cac:BuyerCustomerParty>
+        <cac:Party>
+            <cbc:EndpointID schemeID="${custom.subPeppolId.schemeId}">${custom.subPeppolId.endPointId}</cbc:EndpointID>
+            <#if transaction.subsidiary.name?contains(":")>
+            <cac:PartyName>
+                <cbc:Name>${transaction.subsidiary.name?keep_after_last(": ")}</cbc:Name>
+            </cac:PartyName>
+            <#else>
+                <cac:PartyName>
+                    <cbc:Name>${transaction.subsidiary.name}</cbc:Name>
+                </cac:PartyName>
+            </#if>
+            <#if custom.subCountryISOCode != "">
+                <cac:PostalAddress>
+                    <#if transaction.subsidiary.address1?has_content>
+                        <cbc:StreetName>${transaction.subsidiary.address1}</cbc:StreetName>
+                    </#if>
+                    <#if transaction.subsidiary.address2?has_content>
+                        <cbc:AdditionalStreetName>${transaction.subsidiary.address2}</cbc:AdditionalStreetName>
+                    </#if>
+                    <#if transaction.subsidiary.city?has_content>
+                        <cbc:CityName>${transaction.subsidiary.city}</cbc:CityName>
+                    </#if>
+                    <#if transaction.subsidiary.zip?has_content>
+                        <cbc:PostalZone>${transaction.subsidiary.zip}</cbc:PostalZone>
+                    </#if>
+                    <#if custom.subState != "">
+                        <cbc:CountrySubentity>${custom.subState}</cbc:CountrySubentity>
+                    </#if>
+                    <#if transaction.subsidiary.address3?has_content>
+                        <cac:AddressLine>
+                            <cbc:Line>${transaction.subsidiary.address3}</cbc:Line>
+                        </cac:AddressLine>
+                    </#if>
+                    <cac:Country>
+                        <cbc:IdentificationCode>${custom.subCountryISOCode}</cbc:IdentificationCode>
+                    </cac:Country>
+                </cac:PostalAddress>
+            </#if>
+            <cac:PartyTaxScheme>
+                <#if custom.subVatRegNo != "">
+                    <cbc:CompanyID>${custom.subVatRegNo}</cbc:CompanyID>
+                </#if>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <#if transaction.subsidiary.legalname?has_content>
+                <cbc:RegistrationName>${transaction.subsidiary.legalname}</cbc:RegistrationName>
+                <#elseif transaction.subsidiary.name?contains(":")>
+                <cbc:RegistrationName>${transaction.subsidiary.name?keep_after_last(": ")}</cbc:RegistrationName>
+                <#else>
+                    <cbc:RegistrationName>${transaction.subsidiary.name}</cbc:RegistrationName>
+                </#if>
+                <#if custom.subVatRegNo != "">
+                    <cbc:CompanyID>${custom.subVatRegNo}</cbc:CompanyID>
+                </#if>
+                <#if custom.subCountryISOCode != "">
+                    <cac:RegistrationAddress>
+                        <#if transaction.subsidiary.city?has_content>
+                            <cbc:CityName>${transaction.subsidiary.city}</cbc:CityName>
+                        </#if>
+                        <cac:Country>
+                            <cbc:IdentificationCode>${custom.subCountryISOCode}</cbc:IdentificationCode>
+                        </cac:Country>
+                    </cac:RegistrationAddress>
+                </#if>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:BuyerCustomerParty>
+    <cac:SellerSupplierParty>
+        <cac:Party>
+            <cbc:EndpointID schemeID="${custom.vendPeppolId.schemeId}">${custom.vendPeppolId.endPointId}</cbc:EndpointID>
+            <cac:PartyName>
+                <cbc:Name>${vendor.companyname}</cbc:Name>
+            </cac:PartyName>
+            <cac:PostalAddress>
+                <#if transaction.billaddr1?has_content>
+                    <cbc:StreetName>${transaction.billaddr1}</cbc:StreetName>
+                </#if>
+                <#if transaction.billaddr2?has_content>
+                    <cbc:AdditionalStreetName>${transaction.billaddr2}</cbc:AdditionalStreetName>
+                </#if>
+                <#if transaction.billcity?has_content>
+                    <cbc:CityName>${transaction.billcity}</cbc:CityName>
+                </#if>
+                <#if transaction.billzip?has_content>
+                    <cbc:PostalZone>${transaction.billzip}</cbc:PostalZone>
+                </#if>
+                <#if transaction.billstate?has_content>
+                    <cbc:CountrySubentity>${transaction.billstate}</cbc:CountrySubentity>
+                </#if>
+                <#if transaction.billaddr3?has_content>
+                    <cac:AddressLine>
+                        <cbc:Line>${transaction.billaddr3}</cbc:Line>
+                    </cac:AddressLine>
+                </#if>
+                <cac:Country>
+                    <cbc:IdentificationCode>${custom.billCountryISOCode}</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyLegalEntity>
+                <#if transaction.billaddressee?has_content>
+                <cbc:RegistrationName>${transaction.billaddressee}</cbc:RegistrationName>
+                <#else>
+                    <cbc:RegistrationName>${vendor.companyname}</cbc:RegistrationName>
+                </#if>
+                <#if vendor.entitynumber?has_content>
+                    <cbc:CompanyID schemeID="NETSUITE">${vendor.entitynumber}</cbc:CompanyID>
+                </#if>
+                <#if custom.billCountryISOCode != "">
+                    <cac:RegistrationAddress>
+                        <#if transaction.billcity?has_content>
+                            <cbc:CityName>${transaction.billcity}</cbc:CityName>
+                        </#if>
+                        <cac:Country>
+                            <cbc:IdentificationCode>${custom.billCountryISOCode}</cbc:IdentificationCode>
+                        </cac:Country>
+                    </cac:RegistrationAddress>
+                </#if>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:SellerSupplierParty>
+    <#if custom.incoterm != "">
+        <cac:DeliveryTerms>
+            <cbc:ID>${custom.incoterm}</cbc:ID>
+        </cac:DeliveryTerms>
+    </#if>
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="${txnCurrencyID}">${transaction.taxtotal?string["#0.00"]}</cbc:TaxAmount>
+    </cac:TaxTotal>
+    <cac:AnticipatedMonetaryTotal>
+        <#assign subTotalAmount = transaction.total - transaction.taxtotal />
+        <cbc:LineExtensionAmount currencyID="${txnCurrencyID}">${subTotalAmount?string["#0.00"]}</cbc:LineExtensionAmount>
+        <cbc:TaxExclusiveAmount currencyID="${txnCurrencyID}">${subTotalAmount?string["#0.00"]}</cbc:TaxExclusiveAmount>
+        <cbc:TaxInclusiveAmount currencyID="${txnCurrencyID}">${transaction.total?string["#0.00"]}</cbc:TaxInclusiveAmount>
+        <cbc:PayableAmount currencyID="${txnCurrencyID}">${transaction.total?string["#0.00"]}</cbc:PayableAmount>
+    </cac:AnticipatedMonetaryTotal>
+    <#list custom.itemDetails as item>
+        <cac:OrderLine>
+            <#if transaction.memo?has_content>
+                <cbc:Note>${transaction.memo}</cbc:Note>
+            </#if>
+            <cac:LineItem>
+                <cbc:ID>${item.line}</cbc:ID>
+                <cbc:Quantity unitCode="NAR">${item.quantity?number}</cbc:Quantity>
+                <#if item.amount != "">
+                    <cbc:LineExtensionAmount currencyID="${txnCurrencyID}">${item.amount?number?string["#0.00"]}</cbc:LineExtensionAmount>
+                </#if>
+                <cac:Delivery>
+                    <cac:RequestedDeliveryPeriod>
+                        <cbc:StartDate>${transaction.trandate?string["yyyy-MM-dd"]}</cbc:StartDate>
+                    </cac:RequestedDeliveryPeriod>
+                </cac:Delivery>
+                <#if item.lineDiscount?number gt 0>
+                    <cac:AllowanceCharge>
+                        <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+                        <cbc:AllowanceChargeReason>Line Discount</cbc:AllowanceChargeReason>
+                        <#if item.discountRate?contains("%")>
+                            <cbc:MultiplierFactorNumeric>${item.discountRateNum?keep_after("-")?number}</cbc:MultiplierFactorNumeric>
+                        </#if>
+                        <cbc:Amount currencyID="${txnCurrencyID}">${item.lineDiscount?number?string["#0.00"]}</cbc:Amount>
+                        <#if item.discountRate?contains("%")>
+                            <cbc:BaseAmount currencyID="${txnCurrencyID}">${item.baseAmount?number?string["#0.00"]}</cbc:BaseAmount>
+                        </#if>
+                    </cac:AllowanceCharge>
+                </#if>
+                <#if item.lineCharge?number gt 0>
+                    <cac:AllowanceCharge>
+                        <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+                        <cbc:AllowanceChargeReason>Line Charge</cbc:AllowanceChargeReason>
+                        <#if item.chargeRate?contains("%")>
+                            <cbc:MultiplierFactorNumeric>${item.chargeRateNum?number}</cbc:MultiplierFactorNumeric>
+                        </#if>
+                        <cbc:Amount currencyID="${txnCurrencyID}">${item.lineCharge?number?string["#0.00"]}</cbc:Amount>
+                        <#if item.chargeRate?contains("%")>
+                            <cbc:BaseAmount currencyID="${txnCurrencyID}">${item.baseAmount?number?string["#0.00"]}</cbc:BaseAmount>
+                        </#if>
+                    </cac:AllowanceCharge>
+                </#if>
+                <#if item.rate != "">
+                    <cac:Price>
+                        <cbc:PriceAmount currencyID="${txnCurrencyID}">${item.rate?number}</cbc:PriceAmount>
+                    </cac:Price>
+                </#if>
+                <cac:Item>
+                    <#if item.description?trim?has_content>
+                        <cbc:Description>${item.description}</cbc:Description>
+                    </#if>
+                    <cbc:Name>${item.name}</cbc:Name>
+                </cac:Item>
+            </cac:LineItem>
+        </cac:OrderLine>
+    </#list>
+</Order>

@@ -1,0 +1,133 @@
+<Envio>
+	<ModeloDocumento>NFe</ModeloDocumento>
+	<Versao>3.10</Versao>
+	<ide>
+		<cNF>${transaction.custbody_randomnum}</cNF> <!-- random 8 digit number -->
+		<cUF>${companyinformation.state}</cUF>
+		<natOp>${transaction.custbody_operation_nature}</natOp> <!-- Operation Nature Description -->
+		<indPag>${transaction.custbody_paymentterms}</indPag> <!-- Terms on invoice; 0 cash, 1 payment on installments, 2 other --> 
+		<mod>55</mod> 
+		<serie>${transaction.custbody_fiscal_doc_series}</serie> <!--Nota Fiscal Setup-->
+		<nNF>${transaction.custbody_fiscal_doc_number}</nNF> <!--Fiscal Document Number-->
+		<dhEmi>${transaction.trandate}</dhEmi> 
+		<fusoHorario>${transaction.custbody_fusoHorario}</fusoHorario> <!-- Description Unavailable -->
+		<tpNf>1</tpNf> 
+		<idDest>${transaction.custbody_idDest}</idDest> <!-- Description Unavailable -->
+		<indFinal>${transaction.custbody_indFinal}</indFinal> <!-- Description Unavailable -->
+		<indPres>${transaction.custbody_indPres}</indPres> <!-- Description Unavailable -->
+		<cMunFg>${companyinformation.custrecord_tax_jurisdiction}</cMunFg> <!--Tax Jurisdiction of Subsidiary-->
+		<tpImp>${transaction.custbody_tpImp}</tpImp> <!-- Description Unavailable -->
+		<tpEmis>${transaction.custbody_tpEmis}</tpEmis> <!-- Description Unavailable -->
+		<tpAmb>${transaction.custbody_tpAmb}</tpAmb> <!-- Description Unavailable -->
+		<finNFe>${transaction.custbody_finNFe}</finNFe> <!-- Description Unavailable -->
+	</ide>
+	<emit>
+		<CNPJ_emit>${companyinformation.employerid}</CNPJ_emit>
+		<xNome>${companyinformation.legalname}</xNome>
+		<xFant>${companyinformation.companyname}</xFant>
+		<enderEmit>
+			<xLgr>${companyinformation.address2}</xLgr>
+			<nro>${companyinformation.address1}</nro>
+			<xCpl>${companyinformation.custrecord_complement}</xCpl> <!--Complement-->
+			<xBairro>${companyinformation.state}</xBairro>
+			<cMun>${companyinformation.custrecord_citycode}</cMun> <!--City Code; use IBGE table-->
+			<xMun>${companyinformation.city}</xMun>
+			<UF>${companyinformation.custrecord_uf_abbreviation}</UF> <!--UF abbreviation-->
+			<CEP>${companyinformation.zip}</CEP>
+			<cPais>${companyinformation.custrecord_countrycode}</cPais> <!--Country Code; use IBGE table-->
+			<xPais>${companyinformation.country}</xPais>
+			<fone>${companyinformation.phone}</fone>
+			<Email>${companyinformation.email}</Email>
+		</enderEmit>
+		<IE>${companyinformation.custrecord_state_subscription}</IE> <!--Subsidiary state subscription; "Isento" if blank-->
+		<CRT>${companyinformation.custrecord_taxation_code}</CRT> <!--Taxation Code in Subsidiary Setup-->
+	</emit>
+	<dest>
+		<CNPJ_dest>${customer.custenity_cnpj}</CNPJ_dest> <!-- Customer CNPJ if legal entity-->
+		<xNome_dest>${transaction.entity}</xNome_dest>
+		<enderDest>
+			<nro_dest>${customer.billaddr1}</nro_dest>
+			<xCpl_dest>${customer.custrecord_complement}</xCpl_dest> <!-- Complement -->
+			<xBairro_dest>${customer.billstate}</xBairro_dest>
+			<xEmail_dest>${customer.email}</xEmail_dest>
+			<xLgr_dest>${customer.billaddr2}</xLgr_dest>
+			<cMun_dest>${customer.custrecord_citycode}</cMun_dest> <!-- City code; use IBGE table -->
+			<xMun_dest>${customer.billcity}</xMun_dest>
+			<UF_dest>${customer.custrecord_uf_abbreviation}</UF_dest> <!--UF abbreviation--> 
+			<CEP_dest>${customer.billzip}</CEP_dest>
+			<xPais_dest>${customer.billcountry}</xPais_dest>
+			<cPais_dest>${customer.custrecord_countrycode}</cPais_dest>  <!--Country Code; use IBGE table-->
+			<fone_dest>${customer.phone}</fone_dest>
+		</enderDest>
+		<indIEDest>${customer.custrecord_state_subscription}</indIEDest> <!--Customer state subscription; "Isento" if blank-->	
+	</dest>
+	<#list transaction.item as item>
+	<det>
+		<detItem>
+			<prod>
+				<cProd>${item.id}</cProd>
+				<xProd>${item.description}</xProd>
+				<NCM>${item.custitem_ncm}</NCM> <!-- Item NCM -->
+				<EXTIPI>${item.custitem_customfield}</EXTIPI> <!-- New item custom field -->
+				<CFOP>${item.custitem_cfop}</CFOP> <!-- Invoice line CFOP -->
+				<uCOM>${item.units}</uCOM>
+				<qCOM>${item.quantity}</qCOM>
+				<vUnCom>${item.rate}</vUnCom>
+				<vProd>${item.custitem_grossamount}</vProd> <!-- Item gross amount -->
+				<uTrib>${item.units}</uTrib>
+				<qTrib>${item.quantity}</qTrib>
+				<vUnTrib>${(item.custitem_grossamount / item.quantity)}</vUnTrib> <!-- item gross/item quantity-->
+				<vSeg>${item.custitem_insurance}</vSeg> <!-- Total insurance value -->
+				<vDesc>${item.custitem_discountrate}</vDesc> <!-- Discount value -->
+				<vOutro_item>${item.custitem_accessory_costs}</vOutro_item> <!--other billable items + other billable expenses -->
+				<indTot>${item.custitem_indTot}</indTot> <!-- Description Unavailable -->
+				<nTipoItem>${item.custitem_nTipoItem}</nTipoItem> <!-- Description Unavailable -->
+			</prod>
+			<imposto>
+				<vTotTrib>${item.custitem_vTotTrib}</vTotTrib> <!-- Description Unavailable -->
+				<ICMS>
+					<orig>${item.custitem_origin}</orig> <!-- Item origin -->
+					<CST>${item.custitem_icms_cst}</CST> <!-- Item ICMS CST-->
+					<modBC>${item.custitem_modBC}</modBC><!-- Description Unavailable -->
+					<vBC>${item.custitem_icms_tax_basis}</vBC> <!-- ICMS Tax basis -->
+					<pICMS>${item.custitem_icms_tax_rate}</pICMS> <!-- ICMS tax rate -->
+					<vICMS_icms>${item.custitem_icms_tax_value}</vICMS_icms> <!-- ICMS tax value -->
+				</ICMS>
+				<PIS>
+					<CST_pis>${item.custitem_pis_cst}</CST_pis> <!-- PIS CST -->
+				</PIS>
+				<COFINS>
+					<CST_cofins>${item.custitem_cofins_cst}</CST_cofins> <!-- COFINS CST -->
+				</COFINS>
+			</imposto>
+			<infADProd>${item.custitem_additional_info}</infADProd> <!-- Product Additional Information -->
+		</detItem>
+	</det>
+	</#list>
+	<total>
+		<ICMStot>
+			<vBC_ttlnfe>${transaction.custbody_icms_taxbase}</vBC_ttlnfe> <!-- Sum of all ICMS tax basis-->
+			<vICMS_ttlnfe>${transaction.custbody_icms_total}</vICMS_ttlnfe> <!-- Sum of all valor do icms normal -->
+			<vBCST_ttlnfe>${transaction.custbody_icms_st_taxbase}</vBCST_ttlnfe> <!-- Sum of all base de calculo ICMS ST-->
+			<vST_ttlnfe>${transaction.custbody_icms_st_total}</vST_ttlnfe> <!-- Sum of all valor do icms substituicao -->
+			<vProd_ttlnfe>${transaction.custbody_prod_svc_total}</vProd_ttlnfe> <!-- Sum of all product and services values -->
+			<vFrete_ttlnfe>${transaction.custbody_freight_total}</vFrete_ttlnfe> <!-- Sum of all freight value for all items -->
+			<vSeg_ttlnfe>${transaction.custbody_insurance_total}</vSeg_ttlnfe> <!-- Sum of all insurance value for all items -->
+			<vDesc_ttlnfe>${transaction.custbody_discount_total}</vDesc_ttlnfe> <!-- Sum of all the discount value for all items -->
+			<vIPI_ttlnfe>${transaction.custbody_ipi_total}</vIPI_ttlnfe> <!-- Sum of all IPI total of all items -->
+			<vPIS_ttlnfe>${transaction.custbody_pis_total}</vPIS_ttlnfe> <!-- Sum of all PIS total of all items -->
+			<vCOFINS_ttlnfe>${transaction.custbody_cofins_total}</vCOFINS_ttlnfe> <!-- Sum of all COFINS total value of all items -->
+			<vOutro>${transaction.custbody_other_accessory_total}</vOutro> <!-- Sum of all other expenses for all items -->
+			<vICMSDeson_ttlnfe>${transaction.custbody_vICMSDeson_ttlnfe}</vICMSDeson_ttlnfe> <!-- Description Unavailable -->
+			<vNF>${transaction.custbody_nfe_total}</vNF> <!-- NFe total value -->
+			<vTotTrib_ttlnfe>${transaction.custbody_vTotTrib_ttlnfe}</vTotTrib_ttlnfe> <!-- Description Unavailable -->
+		</ICMStot>
+	</total>
+	<transp>
+		<modFrete>${transaction.custbody_freight_mode}</modFrete> <!-- Incoterms form fulfillment -->
+	</transp>
+	<infAdic>
+		<infAdFisco>${customer.custentity_nfe_addtlinfo}</infAdFisco> <!-- Additional info concerning authorities -->
+		<infCpl>${customer.custentity_nfe_complementaryinfo}</infCpl> <!-- Complementary infomration concerning to the company -->
+	</infAdic>
+</Envio>

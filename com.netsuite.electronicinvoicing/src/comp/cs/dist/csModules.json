@@ -1,0 +1,13 @@
+{
+    "paths": {
+		"cs_e_template": "../cs_e_template.js",
+        "cs_ei_transaction": "./csEITransaction.js",
+        "cs_customer": "./csCustomer.js",
+        "cs_e_outbound_form": "./csEOutboundForm.js",
+        "cs_ei_document_standard": "./csEIDocumentStandard.js",
+        "cs_ei_inbound_edocument": "./csEIInboundEDoument.js",
+        "cs_ei_inbound_form": "./csEIInboundForm.js",
+        "cs_ei_sending_method": "./csEISendingMethod.js",
+        "cs_vendor": "./csVendor.js"
+    }
+}

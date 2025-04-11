@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Payment>
+    <PaymentHeader>
+        <InvoiceType>Payment Receipt</InvoiceType>
+        <Number>${transaction.tranid}</Number>
+        <PaymentDate>${transaction.trandate}</PaymentDate>
+        <paymentAmount>${transaction.payment}</paymentAmount>
+        <Currency>${transaction.currency}</Currency>
+        <Memo>${transaction.memo}</Memo>
+        <Customer>
+            <Name>${transaction.entity}</Name>
+            <Address>
+                <ZIP>${transaction.billzip}</ZIP>
+                <City>${transaction.billcity}</City>
+                <Street>${transaction.billaddr1}</Street>
+                <Country>${transaction.billcountry}</Country>
+            </Address>
+            <VATNumber>${customer.vatregnumber}</VATNumber>
+        </Customer>
+        <CompanyInformation>
+            <Name>${companyinformation.legalname}</Name>
+            <Address>
+                <ZIP>${companyinformation.returnzip}</ZIP>
+                <City>${companyinformation.returncity}</City>
+                <Street>${companyinformation.returnaddress1}</Street>
+                <Country>${companyinformation.returncountry}</Country>
+            </Address>
+            <VATNumber>${companyinformation.employerid}</VATNumber>
+        </CompanyInformation>
+    </PaymentHeader>
+    <#list transaction.apply as apply>
+        <#if apply.apply == true>
+    <PaymentDetails>
+        <InvoiceDate>${apply.applydate}</InvoiceDate>
+        <InvoiceDescription>${apply.type} #${apply.refnum}</InvoiceDescription>
+        <InvoiceOrigAmt>${apply.total}</InvoiceOrigAmt>
+        <InvoiceAmtDue>${apply.due}</InvoiceAmtDue>
+        <InvoiceDiscount><#if apply.disc gt 0>${apply.disc}<#else>0.00</#if></InvoiceDiscount>
+        <InvoicePmtAmt>${apply.amount}</InvoicePmtAmt>
+    </PaymentDetails>
+        </#if>
+    </#list>
+</Payment>

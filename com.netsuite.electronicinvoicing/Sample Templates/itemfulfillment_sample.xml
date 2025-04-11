@@ -1,0 +1,36 @@
+<ItemFulfillment>
+    <ItemFulfillmentNumber>${transaction.tranid}</ItemFulfillmentNumber>
+    <Customer>
+        <Name>${transaction.entity}</Name>
+        <VATNumber>${customer.vatregnumber}</VATNumber>
+        <Address>
+            <ZIP>${transaction.billzip}</ZIP>
+            <City>${transaction.billcity}</City>
+            <Street>${transaction.billaddr1}</Street>
+            <Country>${transaction.billcountry}</Country>
+        </Address>
+    </Customer>
+    <FulFillmentDate>${transaction.trandate}</FulFillmentDate>
+    <Memo>${transaction.memo}</Memo>
+    <CompanyInformation>
+        <Name>${companyinformation.legalname}</Name>
+        <Address>
+            <ZIP>${companyinformation.zip}</ZIP>
+            <City>${companyinformation.city}</City>
+            <Street>${companyinformation.addr1}</Street>
+            <Country>${companyinformation.country}</Country>
+        </Address>
+        <VATNumber>${companyinformation.taxid}</VATNumber>
+    </CompanyInformation>
+	<PONumber>${transaction.createdfrom.otherrefnum}</PONumber>
+    <Items>
+    <#list transaction.item as item>
+			<Item>
+				<Item>${item.item}</Item>
+				<Quantity>${item.quantity}</Quantity>
+				<UnitPrice>${item.rate?string("0.00")}</UnitPrice>
+				<LineItemSubtotal>${item.amount?string("0.00")}</LineItemSubtotal>
+			</Item>
+    </#list>
+    </Items>
+</ItemFulfillment>

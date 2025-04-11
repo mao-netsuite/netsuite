@@ -1,0 +1,38 @@
+<#ftl ns_prefixes={"D":"urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2", "cac":"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2", "cbc":"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"}>
+{
+"tranid":"${XML["D:CreditNote"]["cbc:ID"]}",
+"trandate": "${custom["trandate"]}",
+"duedate": "${custom["duedate"]}",
+"memo":"${XML["D:CreditNote"]["cbc:Note"]}",
+<#if custom["isMultiCurrency"] == "true">
+"currency":"${custom["currencyISOCode"]}",
+</#if>
+"createdfrom":"${XML["D:CreditNote"]["cbc:BuyerReference"]}",
+"item": [
+<#assign index=0>
+<#assign taxcodeString="taxcode_">
+<#assign lineExtensionString ="lineextension_">
+<#assign priceString ="price_">
+<#list XML["D:CreditNote"]["cac:CreditNoteLine"] as item>
+{
+"account": "${item["cac:Item"]["cbc:Name"]}",
+"vendorcode": "${item["cac:Item"]["cbc:Name"]}",
+"vendorname": "${item["cac:Item"]["cbc:Name"]}",
+"quantity": "${item["cbc:CreditedQuantity"]}",
+"rate": "${custom[priceString+index]}",
+"amount": "${custom[lineExtensionString+ index]}",
+"location":"1",
+"description": "${item["cac:Item"]["cbc:Name"]}",
+"inventorydetailreq":false
+<#assign index++>
+}<#if item_has_next>,</#if>
+</#list>
+],
+"apply": [
+<#list XML["D:CreditNote"]["cac:BillingReference"] as ref>
+{
+"refnum": "${ref["cac:InvoiceDocumentReference"]["cbc:ID"]}",
+}<#if ref?has_next>,</#if>
+</#list>
+]
+}

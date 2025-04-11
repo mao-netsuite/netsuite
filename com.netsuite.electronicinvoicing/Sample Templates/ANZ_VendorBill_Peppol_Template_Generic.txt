@@ -1,0 +1,29 @@
+<#ftl ns_prefixes={"D":"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2", "cac":"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2", "cbc":"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"}>
+{
+"tranid":"${XML["D:Invoice"]["cbc:ID"]}",
+"trandate": "${CUSTOM["trandate"]}",
+"duedate": "${CUSTOM["duedate"]}",
+"memo":"${XML["D:Invoice"]["cbc:Note"]}",
+<#if custom["isMultiCurrency"] == "true">
+ "currency":"${CUSTOM["currencyISOCode"]}",
+</#if>
+"item": [
+<#assign index=0>
+<#assign taxcodeString="taxcode_">
+<#assign lineExtensionString ="lineextension_">
+<#assign priceString ="price_">
+<#list XML["D:Invoice"]["cac:InvoiceLine"] as item>
+{
+"vendorcode": "${item["cac:Item"]["cbc:Name"]}",
+"vendorname": "${item["cac:Item"]["cbc:Name"]}",
+"quantity": "${item["cbc:InvoicedQuantity"]}",
+"rate": "${CUSTOM[priceString+index]}",
+"taxcode": "${CUSTOM[taxcodeString+index]}",
+"amount":"${CUSTOM[lineExtensionString+index]}",
+"description": "${item["cac:Item"]["cbc:Name"]}",
+"inventorydetailreq":false
+<#assign index++>
+}<#if item_has_next>,</#if>
+</#list>
+]
+}
